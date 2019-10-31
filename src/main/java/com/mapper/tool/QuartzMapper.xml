@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.tool.QuartzMapper">
+
+	<sql id="columns">
+				a.ID AS "id",
+				a.JOB_NAME AS "jobName",
+				a.JOB_GROUP AS "jobGroup",
+				a.CLASS_PATH AS "classPath",
+				a.CRON_STR AS "cronStr",
+				a.STATE AS "state",
+				a.MARK AS "mark"
+	</sql>
+	
+	 <!-- 查询条件 -->
+    <sql id="selectPageParmas">
+        <where>
+        	1=1
+        	<if test="id != null and id != '' ">
+            	<![CDATA[and a.id =  #{id}]]>
+            </if>
+            <if test="state != null and state != '' ">
+            	<![CDATA[and a.state =  #{state}]]>
+            </if>
+            <if test="jobName != null and jobName != '' ">
+            	<if test="dbName == 'mysql'">
+            		<![CDATA[and a.job_name like CONCAT(CONCAT('%', #{jobName}), '%')]]>
+            	</if>
+            	<if test="dbName == 'mssql'">
+            		<![CDATA[and a.job_name like '%'+#{jobName}+'%']]>
+            	</if>
+				<if test="dbName == 'oracle'">
+					<![CDATA[and a.job_name like '%'||#{jobName}||'%']]>
+				</if>
+            </if>
+        </where>
+    </sql>
+    
+    <select id="get" parameterType="com.model.tool.Quartz" resultType="com.model.tool.Quartz">
+        select 
+			<include refid="columns"/>
+        from sys_quartz a
+        <include refid="selectPageParmas" />
+    </select>
+    
+	<select id="getCount" parameterType="com.model.tool.Quartz" resultType="Long">
+        select count(id)
+        from sys_quartz a
+        <include refid="selectPageParmas" />
+    </select>
+	
+	<select id="getListByPage" resultType="com.model.tool.Quartz" parameterType="com.model.tool.Quartz" >
+	<!-- 同时生成了两个数据库的代码，可以根据自己需要删除 -->
+		<if test="dbName == 'mysql'">
+			select
+	    		<include refid="columns"/>
+	    	from sys_quartz a
+	    	<include refid="selectPageParmas" />
+	    	LIMIT #{start},#{limit}
+		</if>
+		<if test="dbName == 'mssql'">
+			 SELECT
+			      TOP ${limit} *
+			  FROM
+			      (
+			          SELECT
+			              ROW_NUMBER () OVER (ORDER BY id ASC) RowNumber ,<include refid="columns"/>
+			          FROM
+			             sys_quartz a
+			              <include refid="selectPageParmas" />
+			      ) A
+			 WHERE
+			     A.RowNumber > (#{start} - 1) * #{limit}
+		</if>
+		<if test="dbName == 'oracle'">
+			SELECT * FROM
+			(
+			SELECT A.*, ROWNUM RN
+			FROM (SELECT <include refid="columns"/> FROM sys_quartz a <include refid="selectPageParmas" />) A
+			)
+			WHERE RN BETWEEN (#{start}+1) AND (#{limit}+#{start})
+		</if>
+	 </select>
+	
+	<select id="getAllList" resultType="com.model.tool.Quartz" parameterType="com.model.tool.Quartz" >
+    	select
+    		<include refid="columns"/>
+    	from sys_quartz a
+    	<include refid="selectPageParmas" />
+    	order by a.job_name asc
+	 </select>
+	 
+	 <select id="getAllListByMap" resultType="map" parameterType="com.model.tool.Quartz" >
+    	select
+    		<include refid="columns"/>
+    	from sys_quartz a
+    	<include refid="selectPageParmas" />
+    	order by a.job_name asc
+	 </select>
+	 
+  	<insert id="insert">
+		INSERT INTO sys_quartz(
+					JOB_NAME,
+					JOB_GROUP,
+					CLASS_PATH,
+					CRON_STR,
+					STATE,
+					MARK
+		) VALUES (
+					#{jobName},
+					#{jobGroup},
+					#{classPath},
+					#{cronStr},
+					#{state},
+					#{mark}
+		)
+	</insert>
+  
+  	<update id="update">
+		UPDATE sys_quartz SET 	
+						<if test="jobName != null and jobName != ''">JOB_NAME = #{jobName},</if>
+						<if test="jobGroup != null and jobGroup != ''">JOB_GROUP = #{jobGroup},</if>
+						<if test="classPath != null and classPath != ''">CLASS_PATH = #{classPath},</if>
+						<if test="cronStr != null and cronStr != ''">CRON_STR = #{cronStr},</if>
+						<if test="state != null and state != ''">STATE = #{state},</if>
+						<if test="mark != null and mark != ''">MARK = #{mark}</if>
+		WHERE id =  #{id}
+	</update>
+	
+	  <delete id="delete" parameterType="java.lang.Integer" >
+	    delete from sys_quartz
+	    where id = #{id,jdbcType=INTEGER}
+	  </delete>
+</mapper>

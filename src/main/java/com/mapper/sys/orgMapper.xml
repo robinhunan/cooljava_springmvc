@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.sys.OrgMapper">
+
+	<sql id="columns">
+				a.id AS "id",
+				a.pid AS "pid",
+				a.name AS "name",
+				a.sort AS "sort",
+				a.type AS "type"
+	</sql>
+	
+	 <!-- 查询条件 -->
+    <sql id="selectPageParmas">
+        <where>
+        	1=1
+        	<if test="id != null and id != '' ">
+            	<![CDATA[and a.id =  #{id}]]>
+            </if>
+        </where>
+    </sql>
+    
+    <select id="get" parameterType="com.model.sys.Org" resultType="com.model.sys.Org">
+        select 
+			<include refid="columns"/>
+        from sys_org a
+        <include refid="selectPageParmas" />
+    </select>
+    
+	<select id="getCount" parameterType="com.model.sys.Org" resultType="Long">
+        select count(id)
+        from sys_org a
+        <include refid="selectPageParmas" />
+    </select>
+	
+	<select id="getAllList" resultType="com.model.sys.Org" parameterType="com.model.sys.Org" >
+			select
+	    		<include refid="columns"/>
+	    	from sys_org a
+	 </select>
+	 
+	 
+	<select id="getListByPage" resultType="com.model.sys.Org" parameterType="com.model.sys.Org" >
+	<!-- 同时生成了两个数据库的代码，可以根据自己需要删除 -->
+		<if test="dbName == 'mysql'">
+			select
+	    		<include refid="columns"/>
+	    	from sys_org a
+	    	<include refid="selectPageParmas" />
+	    	LIMIT #{start},#{limit}
+		</if>
+		<if test="dbName == 'mssql'">
+			 SELECT
+			      TOP ${limit} *
+			  FROM
+			      (
+			          SELECT
+			              ROW_NUMBER () OVER (ORDER BY id ASC) RowNumber ,<include refid="columns"/>
+			          FROM
+			             sys_org a
+			              <include refid="selectPageParmas" />
+			      ) A
+			 WHERE
+			     A.RowNumber > (#{start} - 1) * #{limit}
+		</if>
+        <if test="dbName == 'oracle'">
+            SELECT
+            <include refid="columns"/>
+            from sys_org a
+            <include refid="selectPageParmas" />
+            WHERE ROWNUM BETWEEN (#{start}+1) AND (#{limit}+#{start})
+        </if>
+
+	 </select>
+	 
+	 <select id="getByPidTree" resultType="com.model.sys.OrgTree" parameterType="com.model.sys.OrgTree" >
+    	select
+    		<include refid="columns"/>
+    	from sys_org a
+    	<where>
+    		 a.pid = #{id,jdbcType=DOUBLE}
+    	</where>
+	 </select>
+	 
+	   	<select id="getByPid" resultType="com.model.sys.Org" parameterType="com.model.sys.Org" >
+    	select
+    		<include refid="columns"/>
+    	from sys_org a
+    	<where>
+			AND a.pid = #{id,jdbcType=DOUBLE}
+    	</where>
+	 </select>
+	 
+  	<insert id="insert">
+		INSERT INTO sys_org(
+					pid,
+					name,
+					sort,
+					type
+		) VALUES (
+					#{pid},
+					#{name},
+					#{sort},
+					#{type}
+		)
+	</insert>
+  
+  	<update id="update">
+		UPDATE sys_org SET 	
+						<if test="pid != null and pid != ''">pid = #{pid},</if>
+						<if test="name != null and name != ''">name = #{name},</if>
+						<if test="sort != null and sort != ''">sort = #{sort},</if>
+						<if test="type != null and type != ''">type = #{type}</if>
+		WHERE id =  #{id}
+	</update>
+	
+	  <delete id="delete" parameterType="java.lang.Integer" >
+	    delete from sys_org
+	    where id = #{id,jdbcType=DOUBLE}
+	  </delete>
+</mapper>

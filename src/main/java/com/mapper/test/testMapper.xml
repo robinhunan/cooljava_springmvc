@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.test.TestMapper">
+
+	<sql id="columns">
+				a.id AS "id",
+				a.value AS "value",
+				a.label AS "label",
+				a.type AS "type",
+				a.description AS "description",
+				a.sort AS "sort",
+				a.status AS "status"
+	</sql>
+	
+	 <!-- 查询条件 -->
+    <sql id="selectPageParmas">
+        <where>
+        	1=1
+        	<if test="id != null and id != '' ">
+            	<![CDATA[and a.id =  #{id}]]>
+            </if>
+        </where>
+    </sql>
+    
+    <select id="get" parameterType="com.model.test.Test" resultType="com.model.test.Test">
+        select 
+			<include refid="columns"/>
+        from code_test a
+        <include refid="selectPageParmas" />
+    </select>
+    
+	<select id="getCount" parameterType="com.model.test.Test" resultType="Long">
+        select count(id)
+        from code_test a
+        <include refid="selectPageParmas" />
+    </select>
+	
+	<select id="getAllList" resultType="com.model.test.Test" parameterType="com.model.test.Test" >
+		<if test="dbName == 'mysql'">
+			select
+	    		<include refid="columns"/>
+	    	from code_test a
+	    	<include refid="selectPageParmas" />
+		</if>
+		<if test="dbName == 'mssql'">
+			 SELECT
+			      <include refid="columns"/>
+			  FROM code_test a
+			     <include refid="selectPageParmas" />
+		</if>
+        <if test="dbName == 'oracle'">
+            SELECT
+            <include refid="columns"/>
+            FROM code_test a
+            <include refid="selectPageParmas" />
+        </if>
+	 </select>
+	 
+	<select id="getListByPage" resultType="com.model.test.Test" parameterType="com.model.test.Test" >
+	    <!-- 数据库类型不一样，sql不一样 -->
+		<if test="dbName == 'mysql'">
+			select
+	    		<include refid="columns"/>
+	    	from code_test a
+	    	<include refid="selectPageParmas" />
+	        LIMIT #{start},#{limit}
+		</if>
+		<if test="dbName == 'mssql'">
+			 SELECT
+			      TOP ${limit} *
+			  FROM
+			      (
+			          SELECT
+			              ROW_NUMBER () OVER (ORDER BY id ASC) RowNumber ,<include refid="columns"/>
+			          FROM
+			             code_test a
+			              <include refid="selectPageParmas" />
+			      ) A
+			 WHERE
+			     A.RowNumber > (#{start} - 1) * #{limit}
+		</if>
+        <if test="dbName == 'oracle'">
+            SELECT
+            <include refid="columns"/>
+            from code_test a
+            <include refid="selectPageParmas" />
+            and ROWNUM BETWEEN (#{start}+1) AND (#{start}+#{limit})
+        </if>
+	 </select>
+	 
+  	<insert id="insert">
+		INSERT INTO code_test(
+					value,
+					label,
+					type,
+					description,
+					sort,
+					status
+		) VALUES (
+					#{value},
+					#{label},
+					#{type},
+					#{description},
+					#{sort},
+					#{status}
+		)
+	</insert>
+  
+  	<update id="update">
+		UPDATE code_test SET 	
+						<if test="value != null and value != ''">value = #{value},</if>
+						<if test="label != null and label != ''">label = #{label},</if>
+						<if test="type != null and type != ''">type = #{type},</if>
+						<if test="description != null and description != ''">description = #{description},</if>
+						<if test="sort != null and sort != ''">sort = #{sort},</if>
+						<if test="status != null and status != ''">status = #{status}</if>
+		WHERE id =  #{id}
+	</update>
+	
+	  <delete id="delete" parameterType="java.lang.Integer" >
+	    delete from code_test
+	    where id = #{id,jdbcType=INTEGER}
+	  </delete>
+</mapper>

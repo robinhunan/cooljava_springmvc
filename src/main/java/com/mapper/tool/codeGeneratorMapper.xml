@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.tool.CodeGeneratorMapper">
+
+	<!-- 获取所有的表名称 -->
+	<select id="getTablesList" parameterType="java.util.Map"  resultType="java.util.Map">
+		<if test="dbName == 'mysql'">
+			select TABLE_NAME  as TABLENAME
+			from information_schema.TABLES t
+			where t.TABLE_SCHEMA=#{database} order by TABLENAME
+		</if>
+		<if test="dbName == 'mssql'">
+			select name  as TABLENAME from sysobjects where xtype='u'
+		</if>
+		<if test="dbName == 'oracle'">
+			select TABLE_NAME  as TABLENAME  from user_tables order by TABLENAME
+		</if>
+	</select>
+
+	<!-- 获取列数据 -->
+	<select id="getListMap" parameterType="java.util.Map"  resultType="java.util.Map">
+		<if test="dbName == 'mysql'">
+			SELECT  COLUMN_NAME COLUMNNAME,COLUMN_TYPE COLUMNTYPE,COLUMN_KEY COLUMNKEY ,CHARACTER_MAXIMUM_LENGTH DATALENGTH,
+			IS_NULLABLE ISNULLABLE,COLUMN_COMMENT COLUMNCOMMENT
+			FROM INFORMATION_SCHEMA.COLUMNS T
+			WHERE TABLE_NAME = #{table_name} AND T.TABLE_SCHEMA=#{database}
+
+		</if>
+		<if test="dbName == 'mssql'">
+			SELECT COLUMN_NAME COLUMNNAME,DATA_TYPE COLUMNTYPE,CHARACTER_MAXIMUM_LENGTH DATALENGTH,
+			IS_NULLABLE ISNULLABLE,'' COLUMNCOMMENT FROM INFORMATION_SCHEMA.columns WHERE TABLE_NAME=#{table_name}
+		</if>
+		<if test="dbName == 'oracle'">
+			SELECT  b.COLUMN_NAME COLUMNNAME,b.DATA_TYPE COLUMNTYPE,b.DATA_LENGTH DATALENGTH,
+			b.NULLABLE ISNULLABLE,b.DATA_SCALE DATASCALE,a.comments COLUMNCOMMENT
+			FROM all_tab_columns b left join user_col_comments a on a.TABLE_NAME=b.TABLE_NAME and a.COLUMN_NAME=b.COLUMN_NAME
+			WHERE  b.TABLE_NAME = #{table_name} ORDER BY b.COLUMN_ID
+		</if>
+	</select>
+
+</mapper>

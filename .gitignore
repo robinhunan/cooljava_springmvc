@@ -1,0 +1,8 @@
+.DS_Store
+.settings
+.idea
+*.iws
+*.iml
+*.ipr
+target
+logs

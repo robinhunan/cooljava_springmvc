@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.sys.DictMapper">
+
+	<sql id="columns">
+		a.id AS "id",
+		a.value AS "value",
+		a.label AS "label",
+		a.type AS "type",
+		a.description AS "description",
+		a.sort AS "sort",
+		a.status AS "status"
+	</sql>
+	
+	 <!-- 查询条件 -->
+    <sql id="selectPageParmas">
+        <where>
+        	1=1
+        	<if test="id != null and id != '' ">
+            	<![CDATA[and a.id = #{id}]]>
+            </if>
+            <if test="type != null and type != '' ">
+            	<if test="dbName == 'mysql'">
+            		<![CDATA[and a.type like CONCAT(CONCAT('%', #{type}), '%')]]>
+            	</if>
+            	<if test="dbName == 'mssql'">
+            		<![CDATA[and a.type like '%'+#{type}+'%']]>
+            	</if>
+                <if test="dbName == 'oracle'">
+                    <![CDATA[and a.type like '%'||#{type}||'%']]>
+                </if>
+
+            </if>
+            <if test="description != null and description != '' ">
+            	<if test="dbName == 'mysql'">
+            		<![CDATA[and a.description like CONCAT(CONCAT('%', #{description}), '%')]]>
+            	</if>
+            	<if test="dbName == 'mssql'">
+            		<![CDATA[and a.description like '%'+#{description}+'%']]>
+            	</if>
+                <if test="dbName == 'oracle'">
+                    <![CDATA[and a.description like '%'||#{description}||'%']]>
+                </if>
+            </if>
+        </where>
+    </sql>
+    
+    <select id="get" parameterType="com.model.sys.Dict" resultType="com.model.sys.Dict">
+        select 
+			<include refid="columns"/>
+        from sys_dict a
+        <include refid="selectPageParmas" />
+    </select>
+    
+	<select id="getCount" parameterType="com.model.sys.Dict" resultType="Long">
+        select count(id)
+        from sys_dict a
+        <include refid="selectPageParmas" />
+    </select>
+	
+	<select id="getListByPage" resultType="com.model.sys.Dict" parameterType="com.model.sys.Dict" >
+		<if test="dbName == 'mysql'">
+			select
+	    		<include refid="columns"/>
+	    	from sys_dict a
+	    	<include refid="selectPageParmas" />
+	    	LIMIT #{start},#{limit}
+		</if>
+		<if test="dbName == 'mssql'">
+			 SELECT
+			      TOP ${limit} *
+			  FROM
+			      (
+			          SELECT
+			              ROW_NUMBER () OVER (ORDER BY id ASC) RowNumber ,<include refid="columns"/>
+			          FROM
+			              sys_dict a
+			              <include refid="selectPageParmas" />
+			      ) A
+			 WHERE
+			     A.RowNumber > (#{start} - 1) * #{limit}
+		</if>
+        <if test="dbName == 'oracle'">
+            SELECT
+            <include refid="columns"/>
+            from sys_dict a
+            <include refid="selectPageParmas" />
+            and ROWNUM BETWEEN (#{start}+1) AND (#{limit}+#{start})
+        </if>
+	 </select>
+	 
+  	<insert id="insert">
+		INSERT INTO sys_dict(
+			<if test="dbName == 'mysql'">id,</if>
+			value,
+			label,
+			type,
+			description,
+			sort,
+			status
+		) VALUES (
+			<if test="dbName == 'mysql'">#{id},</if>
+			#{value},
+			#{label},
+			#{type},
+			#{description},
+			#{sort},
+			#{status}
+		)
+	</insert>
+  
+  	<update id="update">
+		UPDATE sys_dict SET 	
+			<if test="id != null and id != '' and dbName == 'mysql'">id = #{id},</if>
+			<if test="value != null and value != ''">value = #{value},</if>
+			<if test="label != null and label != ''">label = #{label},</if>
+			<if test="type != null and type != ''">type = #{type},</if>
+			<if test="description != null and description != ''">description = #{description},</if>
+			<if test="sort != null and sort != ''">sort = #{sort},</if>
+			<if test="status != null and status != ''">status = #{status}</if>
+		WHERE id = #{id}
+	</update>
+	
+	  <delete id="delete" parameterType="java.lang.Integer" >
+	    delete from sys_dict
+	    where id = #{id,jdbcType=INTEGER}
+	  </delete>
+</mapper>

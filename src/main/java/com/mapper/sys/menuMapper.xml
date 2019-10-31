@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.sys.MenuMapper">
+
+	<sql id="columns">
+		a.id AS "id",
+		a.pid AS "pid",
+		a.title AS "title",
+		a.icon AS "icon",
+		a.href AS "href",
+		a.spread AS "spread",
+		a.sort AS "sort",
+		a.is_top AS "isTop",
+		a.del_flag AS "delFlag",
+		a.levels AS "level",
+		a.type AS "type",
+		a.permission AS "permission"
+	</sql>
+	
+	<sql id="columns2">
+		a.id AS "id",
+		a.pid AS "pid",
+		a.title AS "name",
+		a.spread AS "spread",
+		a.sort AS "sort",
+		a.is_top AS "isTop",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+    <select id="get" resultType="com.model.sys.Menu" parameterType="com.model.sys.Menu" >
+    	select
+    		<include refid="columns"/>
+    	from sys_menu a
+    	<where>
+    		a.del_flag = '0'
+			AND a.id = #{id}
+    	</where>
+    	order by sort asc
+	 </select>
+  	
+  	<select id="getTree" resultType="com.model.sys.MenuTree" parameterType="com.model.sys.MenuTree" >
+    	select
+    		<include refid="columns2"/>
+    	from sys_menu a
+    	<where>
+    		a.del_flag = '0'
+			AND a.id = #{id}
+    	</where>
+    	order by sort asc
+	 </select>
+	 
+	 <!-- 菜单加载用 -->
+	 <select id="getByPidM" resultType="com.model.sys.Menu" parameterType="com.model.sys.Menu" >
+    	select
+    		<include refid="columns"/>
+    	from sys_menu a
+    	<where>
+    		a.del_flag = '0'
+    		AND (select count(1) from sys_role_menu where role_id=#{roleId} and menu_id = a.id) > 0
+			AND a.pid = #{id}
+    	</where>
+    	order by sort asc
+	 </select>
+	 
+  	<select id="getByPid" resultType="com.model.sys.Menu" parameterType="com.model.sys.Menu" >
+    	select
+    		<include refid="columns"/>
+    	from sys_menu a
+    	<where>
+    		a.del_flag = '0'
+			AND a.pid = #{id}
+    	</where>
+    	order by sort asc
+	 </select>
+	 
+	 <select id="getByPidTree" resultType="com.model.sys.MenuTree" parameterType="com.model.sys.MenuTree" >
+    	select
+    		<include refid="columns2"/>
+    	from sys_menu a
+    	<where>
+    		a.del_flag = '0'
+			AND a.pid = #{id,jdbcType=DOUBLE}
+    	</where>
+    	order by sort asc
+	 </select>
+	 
+	  <select id="getByPidTreeCheck" resultType="com.model.sys.MenuTreeCheck" >
+    	select
+    		a.id AS "id",
+			a.pid AS "pid",
+			a.title AS "name",
+			a.spread AS "open",
+			a.sort AS "sort",
+			a.is_top AS "isTop",
+			a.del_flag AS "delFlag",
+			(CASE WHEN (select count(1) from sys_role_menu where role_id = #{roleId,jdbcType=VARCHAR} and menu_id= a.id) > 0  THEN 'true' ELSE 'false' END) AS "checked"
+    	from sys_menu a
+    	<where>
+    		a.del_flag = '0'
+			AND a.pid = #{id,jdbcType=DECIMAL}
+    	</where>
+    	order by sort asc
+	 </select>
+	 <!-- 加载菜单用 -->
+	 <select id="getAllListM" resultType="com.model.sys.Menu" parameterType="com.model.sys.Menu" >
+    	select
+    		<include refid="columns"/>
+    	from sys_menu a
+    	<where>
+    		a.del_flag = '0'
+    		<if test="isTop != null and isTop != ''">
+				AND a.is_top = #{isTop}
+			</if>
+			<if test="pid != null and pid != ''">
+				AND a.pid = #{pid}
+			</if>
+			AND (select count(1) from sys_role_menu where role_id=#{roleId} and menu_id = a.id) > 0
+    	</where>
+    	order by a.sort asc
+	 </select>
+	 
+  	<select id="getAllList" resultType="com.model.sys.Menu" parameterType="com.model.sys.Menu" >
+    	select
+    		<include refid="columns"/>
+    	from sys_menu a
+    	<where>
+    		a.del_flag = '0'
+    		<if test="isTop != null and isTop != ''">
+				AND a.is_top = #{isTop}
+			</if>
+			<if test="pid != null and pid != ''">
+				AND a.pid = #{pid}
+			</if>
+			<!--<if test="pid != null and pid != ''">
+				AND a.pid = #{pid}
+			</if>-->
+			 <if test="title != null and title != '' ">
+            	<if test="dbName == 'mysql'">
+            		<![CDATA[and a.title like CONCAT(CONCAT('%', #{title}), '%')]]>
+            	</if>
+            	<if test="dbName == 'mssql'">
+            		<![CDATA[and a.title like '%'+#{title}+'%']]>
+            	</if>
+                 <if test="dbName == 'oracle'">
+                     <![CDATA[and a.title like '%'||#{title}||'%']]>
+                 </if>
+            </if>
+    	</where>
+    	order by a.sort asc
+	 </select>
+	
+  	<insert id="insert">
+		INSERT INTO sys_menu(
+			<if test="dbName == 'mysql'">id,</if>
+			pid,
+			title,
+			icon,
+			href,
+			sort,
+			is_top,
+			del_flag,
+			levels,
+			type,
+			permission
+		) VALUES (
+			<if test="dbName == 'mysql'">#{id},</if>
+			#{pid},
+			#{title},
+			#{icon},
+			#{href},
+			#{sort},
+			#{isTop},
+			#{delFlag},
+			#{level},
+			#{type},
+			#{permission}
+		)
+	</insert>
+  
+  	<update id="update">
+		UPDATE sys_menu SET 	
+			
+			<if test="pid != null and pid != ''">pid = #{pid},</if>
+			<if test="title != null and title != ''">title = #{title},</if>
+			<if test="icon != null and icon != ''">icon = #{icon},</if>
+			href = #{href},
+			<if test="sort != null and sort != ''">sort = #{sort},</if>
+			<if test="isTop != null and isTop != ''">is_top = #{isTop},</if>
+			<if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+			<if test="level != null and level != ''">levels = #{level},</if>
+			<if test="type != null and type != ''">type = #{type},</if>
+			<if test="permission != null and permission != ''">permission = #{permission},</if>
+			<if test="id != null and id != ''">id = #{id}</if>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="java.lang.Integer" >
+	    delete from sys_menu
+	    where id = #{id,jdbcType=INTEGER}
+	  </delete>
+	  
+</mapper>

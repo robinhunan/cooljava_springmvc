@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.web.FriendLinkMapper">
+
+	<sql id="columns">
+		a.id AS "id",
+		a.webname AS "webname",
+		a.alink AS "alink",
+		a.email AS "email",
+		a.addtime AS "addtime",
+		a.dispos AS "dispos",
+		a.content AS "content"
+	</sql>
+	
+	 <!-- 查询条件 -->
+    <sql id="selectPageParmas">
+        <where>
+        	1=1
+        	<if test="id != null and id != '' ">
+            	<![CDATA[and a.id = #{id}]]>
+            </if>
+            <if test="webname != null and webname != '' ">
+            	<if test="dbName == 'mysql'">
+            		<![CDATA[and a.webname like CONCAT(CONCAT('%', #{webname}), '%')]]>
+            	</if>
+            	<if test="dbName == 'mssql'">
+            		<![CDATA[and a.webname like '%'+#{webname}+'%']]>
+            	</if>
+            </if>
+        </where>
+    </sql>
+    
+    <select id="get" parameterType="com.model.web.FriendLink" resultType="com.model.web.FriendLink">
+        select 
+			<include refid="columns"/>
+        from web_flink a
+        <include refid="selectPageParmas" />
+    </select>
+    
+	<select id="getCount" parameterType="com.model.web.FriendLink" resultType="Long">
+        select count(id)
+        from web_flink a
+        <include refid="selectPageParmas" />
+    </select>
+	
+	<select id="getListByPage" resultType="com.model.web.FriendLink" parameterType="com.model.web.FriendLink" >
+    	<if test="dbName == 'mysql'">
+			select
+	    		<include refid="columns"/>
+	    	from web_flink a
+	    	<include refid="selectPageParmas" />
+	    	LIMIT #{start},#{limit}
+		</if>
+		<if test="dbName == 'mssql'">
+			 SELECT
+			      TOP ${limit} *
+			  FROM
+			      (
+			          SELECT
+			              ROW_NUMBER () OVER (ORDER BY id ASC) RowNumber ,<include refid="columns"/>
+			          FROM
+			              web_flink a
+			              <include refid="selectPageParmas" />
+			      ) A
+			 WHERE
+			     A.RowNumber > (#{start} - 1) * #{limit}
+		</if>
+	 </select>
+	 
+  	<insert id="insert">
+		INSERT INTO web_flink(
+			<if test="dbName == 'mysql'">id,</if>
+			webname,
+			alink,
+			email,
+			addtime,
+			dispos,
+			content
+		) VALUES (
+			<if test="dbName == 'mysql'">#{id},</if>
+			#{webname},
+			#{alink},
+			#{email},
+			#{addtime},
+			#{dispos},
+			#{content}
+		)
+	</insert>
+  
+  	<update id="update">
+		UPDATE web_flink SET 	
+			<if test="id != null and id != '' and dbName == 'mysql'">id = #{id},</if>
+			<if test="webname != null and webname != ''">webname = #{webname},</if>
+			<if test="alink != null and alink != ''">alink = #{alink},</if>
+			<if test="email != null and email != ''">email = #{email},</if>
+			<if test="addtime != null and addtime != ''">addtime = #{addtime},</if>
+			<if test="dispos != null and dispos != ''">dispos = #{dispos},</if>
+			<if test="content != null and content != ''">content = #{content}</if>
+		WHERE id = #{id}
+	</update>
+	
+	  <delete id="delete" parameterType="java.lang.Integer" >
+	    delete from web_flink
+	    where id = #{id,jdbcType=INTEGER}
+	  </delete>
+</mapper>

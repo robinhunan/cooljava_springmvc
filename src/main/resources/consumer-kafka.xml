@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- 1.定义consumer的参数 -->
+    <!--<context:property-placeholder location="classpath*:kafka/kafka.properties" />-->
+    <bean id="consumerProperties" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <!--Kafka服务地址 -->
+                <entry key="bootstrap.servers" value="${kafka.consumer.bootstrap.servers}" />
+                <!--Consumer的组ID，相同goup.id的consumer属于同一个组。 -->
+                <entry key="group.id" value="${kafka.consumer.group.id}" />
+                <!--如果此值设置为true，consumer会周期性的把当前消费的offset值保存到zookeeper。当consumer失败重启之后将会使用此值作为新开始消费的值。 -->
+                <entry key="enable.auto.commit" value="${kafka.consumer.enable.auto.commit}" />
+                <!--网络请求的socket超时时间。实际超时时间由max.fetch.wait + socket.timeout.ms 确定 -->
+                <entry key="session.timeout.ms" value="${kafka.consumer.session.timeout.ms}" />
+                <entry key="auto.commit.interval.ms" value="${kafka.consumer.auto.commit.interval.ms}" />
+                <entry key="retry.backoff.ms" value="100" />
+                <entry key="key.deserializer"
+                       value="${kafka.consumer.key.deserializer}" />
+                <entry key="value.deserializer"
+                       value="${kafka.consumer.value.deserializer}" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- 2.创建consumerFactory bean -->
+    <bean id="consumerFactory"
+          class="org.springframework.kafka.core.DefaultKafkaConsumerFactory" >
+        <constructor-arg>
+            <ref bean="consumerProperties" />
+        </constructor-arg>
+    </bean>
+
+    <!--3.指定具体监听类的bean -->
+   <bean id="kafkaConsumerService" class="com.kafka.KafkaConsumerMessageListener" />
+
+    <!-- 4.消费者容器配置信息 -->
+    <bean id="containerProperties" class="org.springframework.kafka.listener.config.ContainerProperties">
+        <!-- topic -->
+        <constructor-arg name="topics">
+            <list>
+                <value>${kafka.alarm.topic}</value>
+            </list>
+        </constructor-arg>
+        <property name="messageListener" ref="kafkaConsumerService" />
+    </bean>
+    <!-- 5.消费者并发消息监听容器，执行doStart()方法 -->
+    <!-- 不消费,注释避免WARN
+    <bean id="messageListenerContainer" class="org.springframework.kafka.listener.ConcurrentMessageListenerContainer" init-method="doStart" >
+        <constructor-arg ref="consumerFactory" />
+        <constructor-arg ref="containerProperties" />
+    </bean>
+    -->
+</beans>

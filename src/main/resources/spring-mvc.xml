@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.0.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+    <!-- 注解扫描包 -->
+    <context:component-scan base-package="com" />
+
+    <!-- 静态资源请求转发 -->
+    <mvc:default-servlet-handler/>
+    <!-- 启动注解 -->
+<!--    <mvc:annotation-driven/>-->
+    <!-- 解决@ResponseBody注解返回中文乱码问题 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes" value="text/plain;charset=UTF-8" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!-- 自动注入，使系统能够识别相应的注解，使用<context:component-scan/>手动扫描后可以省略该配置 -->
+    <context:annotation-config/>
+    <!-- 配置全局使用的k-v文件路径，添加控制参数，区分测试与正式环境觉得是否启用swagger api文档 -->
+    <context:property-placeholder location="classpath*:dbconfig.properties" file-encoding="UTF-8"/>
+
+    <!-- 添加Swagger2的java config作为SpringMVC的bean -->
+    <bean class="com.swagger.SwaggerConfig"/>
+
+<!--    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>-->
+<!--    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>-->
+
+
+<!--    <mvc:resources location="/,classpath:/META-INF/publicResources/" mapping="/resources/**"/>-->
+<!--    <mvc:resources mapping="/resources/**" location="classpath:/META-INF/resources/"/>-->
+
+
+    <!-- 开启Shiro权限注解拦截-->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor" />
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager" />
+    </bean>
+
+    <!-- 定义跳转的文件的前后缀 ，视图模式配置-->
+    <bean id="viewResolver"
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!-- 这里的配置我的理解是自动给后面action的方法return的字符串加上前缀和后缀，变成一个 可用的url地址 -->
+        <property name="prefix" value="/WEB-INF/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+    
+    <!-- 该文件上传的视图解析器的id必须配，而且id的值是multipartResolver -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+      <property name="maxUploadSize" value="104857600"/>
+        <property name="maxInMemorySize" value="4096"/>
+   </bean>
+
+
+</beans>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <settings>
+        <!-- Print the query sql,use by open-->
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+
+    </settings>
+    <typeAliases>
+        <typeAlias alias="User" type="com.model.user.User"/>
+        <typeAlias alias="FriendLink" type="com.model.web.FriendLink"/>
+         <typeAlias alias="Menu" type="com.model.sys.Menu"/>
+         <typeAlias alias="Role" type="com.model.sys.Role"/>
+         <typeAlias alias="Dict" type="com.model.sys.Dict"/>
+         <typeAlias alias="Test" type="com.model.test.Test"/>
+         <typeAlias alias="Quartz" type="com.model.tool.Quartz"/>
+    </typeAliases>
+    <mappers>
+        <mapper resource="com/mapper/user/userMapper.xml" />
+        <mapper resource="com/mapper/web/friendLinkMapper.xml" />
+        <mapper resource="com/mapper/sys/menuMapper.xml" />
+        <mapper resource="com/mapper/sys/roleMapper.xml" />
+         <mapper resource="com/mapper/sys/dictMapper.xml" />
+         <mapper resource="com/mapper/tool/codeGeneratorMapper.xml" />
+         <mapper resource="com/mapper/test/testMapper.xml" />
+         <mapper resource="com/mapper/tool/quartzMapper.xml" />
+    </mappers>
+
+</configuration>

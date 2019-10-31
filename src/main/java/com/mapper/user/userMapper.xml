@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.user.UserMapper">
+
+	<sql id="columns">
+		a.id AS "id",
+		a.login_name AS "loginName",
+		a.pwd AS "pwd",
+		a.img AS "img",
+		a.email AS "email",
+		a.sex AS "sex",
+		a.mobile AS "mobile",
+		a.status AS "status",
+		a.name AS "name",
+		a.role_id AS "roleId",
+		a.org_id AS "orgId",
+		r.name AS "roleName",
+		o.name AS "orgName"
+	</sql>
+	
+    <select id="get" resultType="com.model.user.User" parameterType="com.model.user.User" >
+
+    	select
+    		<include refid="columns"/>
+    	from sys_user a
+    	left join sys_role r on r.id = a.role_id
+	    left join sys_org o on o.id = a.org_id
+    	<where>
+    		1=1
+    		<if test="loginName != null and loginName != ''">
+				AND a.login_name = #{loginName,jdbcType=VARCHAR}
+			</if>
+			<if test="pwd != null and pwd != ''">
+				AND a.pwd = #{pwd,jdbcType=VARCHAR}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex,jdbcType=VARCHAR}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status,jdbcType=VARCHAR}
+			</if>
+			AND a.id = #{id,jdbcType=DECIMAL}
+    	</where>
+	 </select>
+  	
+  	<select id="getCount" parameterType="com.model.user.User" resultType="Long">
+        select count(id)
+        from sys_user a
+    </select>
+	
+	<select id="getListByPage" resultType="com.model.user.User" parameterType="com.model.user.User" >
+		<if test="dbName == 'mysql'">
+			select
+	    		<include refid="columns"/>
+	    	from sys_user a
+	    	left join sys_role r on r.id = a.role_id
+	    	left join sys_org o on o.id = a.org_id
+	    	LIMIT #{start},#{limit}
+		</if>
+		<if test="dbName == 'mssql'">
+			 SELECT
+			      TOP ${limit} <include refid="columns"/>
+			  FROM
+			      (
+			          SELECT
+			              ROW_NUMBER () OVER (ORDER BY id ASC) RowNumber ,*
+			          FROM
+			              sys_user a
+			             
+			      ) a
+			       left join sys_role r on r.id = a.role_id
+	    		   left join sys_org o on o.id = a.org_id
+			 WHERE
+			     a.RowNumber > (#{start} - 1) * #{limit}
+		</if>
+        <if test="dbName == 'oracle'">
+            SELECT
+            <include refid="columns"/>
+            FROM
+            sys_user a
+            left join sys_role r on r.id = a.role_id
+            left join sys_org o on o.id = a.org_id
+            WHERE ROWNUM BETWEEN (#{start}+1) AND (#{limit}+#{start})
+        </if>
+	 </select>
+	 
+  	<select id="getAllList" resultType="com.model.user.User" parameterType="com.model.user.User" >
+    	select
+    		<include refid="columns"/>
+    	from sys_user a
+    	left join sys_role r on r.id = a.role_id
+	    left join sys_org o on o.id = a.org_id
+    	<where>
+    		1=1
+    		<if test="loginName != null and loginName != ''">
+				AND a.login_name = #{loginName}
+			</if>
+			<if test="pwd != null and pwd != ''">
+				AND a.pwd = #{pwd}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+    	</where>
+	 </select>
+	 
+  	<insert id="insert">
+		INSERT INTO sys_user(
+		id,
+			login_name,
+			pwd,
+			img,
+			email,
+			sex,
+			mobile,
+			name,
+			role_id,
+			org_id
+		) VALUES (
+		#{id},
+			#{loginName},
+			#{pwd},
+			#{img,jdbcType=VARCHAR},
+			#{email},
+			#{sex,jdbcType=VARCHAR},
+			#{mobile,jdbcType=VARCHAR},
+			#{name},
+			#{roleId},
+			#{orgId}
+		)
+	</insert>
+  
+  	<update id="update">
+		UPDATE sys_user SET
+			<if test="loginName != null and loginName != ''">login_name = #{loginName},</if>
+			<if test="pwd != null and pwd != ''">pwd = #{pwd},</if>
+			<if test="img != null and img != ''">img = #{img},</if>
+			<if test="email != null and email != ''">email = #{email},</if>
+			<if test="sex != null and sex != ''">sex = #{sex},</if>
+			<if test="mobile != null and mobile != ''">mobile = #{mobile},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="roleId != null and roleId != ''">role_id = #{roleId},</if>
+			<if test="roleId != null and roleId != ''">org_id = #{orgId},</if>
+			<if test="name != null and name != ''">name = #{name}</if>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="java.lang.Integer" >
+	    delete from sys_user
+	    where id = #{id,jdbcType=INTEGER}
+	  </delete>
+	
+</mapper>
