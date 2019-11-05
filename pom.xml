@@ -20,8 +20,6 @@
 
     <!-- spring版本号 -->
 	<spring.version>4.3.18.RELEASE</spring.version>
-	<!-- mybatis版本号 -->
-	<mybatis.version>3.1.1</mybatis.version>
   </properties>
 
   <dependencies>
@@ -108,14 +106,23 @@
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
-			<version>${mybatis.version}</version>
+			<version>3.2.8</version>
 		</dependency>
 		<!-- mybatis/spring包 -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis-spring</artifactId>
-			<version>1.1.1</version>
+			<version>1.2.2</version>
 		</dependency>
+	     <!-- 热加载修改的 mapper文件 -->
+		  <dependency>
+			  <groupId>com.baomidou</groupId>
+			  <artifactId>mybatis-plus</artifactId>
+			  <version>1.5</version>
+			  <!-- <scope>system</scope>
+			  <systemPath>${lib.dir}/mybatis-plus-1.5.jar</systemPath>
+			  -->
+		  </dependency>
 		<!-- 日志文件管理包 -->
 		<!-- log start -->
 		<dependency>

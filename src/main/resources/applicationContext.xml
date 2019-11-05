@@ -76,6 +76,10 @@
         <property name="mapperLocations" value="classpath:com/mapper/**/*.xml"></property>
         <!-- <property name="mapperLocations" value="classpath:mybatis-config.xml"></property> -->
     </bean>
+    <!-- 自动加载 修改的 mapper文件 -->
+    <bean class="com.util.MybatisXmlMapperAutoReloader" >
+        <property name="enableAutoReload" value="true" />
+    </bean>
 
     <!--
         3. mybatis自动扫描加载Sql映射文件/接口 : MapperScannerConfigurer sqlSessionFactory
