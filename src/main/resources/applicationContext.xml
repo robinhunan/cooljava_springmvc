@@ -214,14 +214,8 @@
                 /login/index.do = anon
                 /login/login.do = anon
                 /swagger-ui.html = anon
-                //webjars/** = anon
-                /v2/** = anon
                 /swagger-resources/** = anon
                 /res/** = anon
-                <!--  /shiro/login = anon
-                 /shiro/logout = logout
-                 /user.jsp = roles[user]
-                 /admin.jsp = roles[admin] -->
                 # everything else requires authentication:
                 /** = authc
             </value>
