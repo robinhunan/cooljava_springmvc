@@ -155,7 +155,7 @@ public class HttpUtil {
         CloseableHttpClient client = HttpClients.createDefault();
         String str = null;
         HttpGet httpGet = new HttpGet(url);
-        requestConfig = RequestConfig.custom()
+        RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(CONNECT_TIME_OUT).setConnectionRequestTimeout(1000)
                 .setSocketTimeout(5000).build();
         httpGet.setConfig(requestConfig);
