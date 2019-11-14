@@ -10,7 +10,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta name="apple-mobile-web-app-capable" content="yes">
-	<link rel="stylesheet" type="text/css" href="${path}/res/layui/css/layui.css" />
+	<link rel="stylesheet" type="text/css" href="${r"${path}"}/res/layui/css/layui.css" />
 	<link rel="stylesheet" href="${r"${path}"}/res/css/public.css" />
 </head>
 <body class="p10">
