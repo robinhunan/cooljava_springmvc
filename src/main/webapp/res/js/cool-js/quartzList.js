@@ -1,11 +1,11 @@
 layui.use(['form','layer','laydate','table','upload'],function(){
     var form = layui.form,
     layer = layui.layer,
-        $ = layui.jquery,
-        laydate = layui.laydate,
-        upload = layui.upload,
-        table = layui.table;
-
+	$ = layui.jquery,
+	laydate = layui.laydate,
+	upload = layui.upload,
+	table = layui.table;
+    $.ajaxSetup({cache:false});
     //定时任务列表
     var tableIns = table.render({
         elem: '#list',

@@ -6,6 +6,8 @@ layui.use(['form','layer','laydate','table','upload'],function(){
         upload = layui.upload,
         table = layui.table;
 
+    $.ajaxSetup({cache:false});
+
     //字典列表
     var tableIns = table.render({
         elem: '#list',

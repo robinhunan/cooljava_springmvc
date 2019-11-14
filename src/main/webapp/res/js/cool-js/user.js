@@ -3,7 +3,8 @@ layui.use(['layer', 'form', 'table'], function() {
 		layer = layui.layer,
 		form = layui.form,
 		table = layui.table;
-	
+    $.ajaxSetup({cache:false});
+    
 	var tableIns = table.render({
 		elem: '#userTables',
 		id: 'userTables',

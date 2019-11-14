@@ -5,6 +5,8 @@ layui.use(['form','layer','laydate','table','upload'],function(){
         laydate = layui.laydate,
         upload = layui.upload,
         table = layui.table;
+    //禁用缓存
+    $.ajaxSetup({cache:false});
 
     //${functionComment}列表
     var tableIns = table.render({

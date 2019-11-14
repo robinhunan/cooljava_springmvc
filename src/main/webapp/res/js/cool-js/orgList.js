@@ -7,7 +7,7 @@ layui.config({
     var table = layui.table;
     var layer = layui.layer;
     var treetable = layui.treetable;
-
+    $.ajaxSetup({cache:false});
     // 渲染表格
     var renderTable = function () {
         layer.load(2);

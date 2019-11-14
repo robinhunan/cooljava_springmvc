@@ -5,6 +5,7 @@ layui.use(['form','layer','laydate','table','upload'],function(){
         laydate = layui.laydate,
         upload = layui.upload,
         table = layui.table;
+    $.ajaxSetup({cache:false});
 
     //友链列表
     var tableIns = table.render({
