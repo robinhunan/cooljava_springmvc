@@ -5,7 +5,7 @@ layui.config({
 }).use(['layer', 'table', 'treetable'], function () {
     var $ = layui.jquery;
     var table = layui.table;
-    var layer = layui.layer;
+    var layer = parent.layer === undefined ? layui.layer : top.layer;
     var treetable = layui.treetable;
     $.ajaxSetup({cache:false});
     // 渲染表格
@@ -75,14 +75,14 @@ layui.config({
                 layer.close(index);
             });
         } else if (layEvent === 'edit') {
-            var index = layer.open({
+            var index = layui.layer.open({
                 title: "机构修改",
                 type: 2,
                 content: path + "/org/edit.do?id="+data.id,
             });
             layui.layer.full(index);//调整窗口大小
         }else if (obj.event === 'add') {//增加下一节点
-            var index = layer.open({
+            var index = layui.layer.open({
                 title: "机构添加",
                 type: 2,
                 offset: ['85px', '430px'],

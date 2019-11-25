@@ -1,6 +1,6 @@
 layui.use(['layer', 'form', 'table'], function() {
 	var $ = layui.$,
-		layer = layui.layer,
+        layer = parent.layer === undefined ? layui.layer : top.layer,
 		form = layui.form,
 		table = layui.table;
 	

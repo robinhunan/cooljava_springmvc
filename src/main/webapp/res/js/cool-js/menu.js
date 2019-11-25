@@ -50,7 +50,7 @@
 
 layui.use(['layer', 'form', 'table'], function() {
 		var $ = layui.$,
-			layer = layui.layer,
+            layer = parent.layer === undefined ? layui.layer : top.layer,
 			form = layui.form,
 			table = layui.table;
 
@@ -152,7 +152,7 @@ layui.use(['layer', 'form', 'table'], function() {
 					layer.close(index);
 				});
 			} else if (obj.event === 'edit') {
-				var index = layer.open({
+				var index = layui.layer.open({
 					title: "菜单修改",
 					type: 2,
 					skin:'',
@@ -164,7 +164,7 @@ layui.use(['layer', 'form', 'table'], function() {
 			            layui.layer.full(index);
 			        });
 			} else if (obj.event === 'add') {//增加下一节点
-				var index = layer.open({
+				var index = layui.layer.open({
 					title: "菜单添加",
 					type: 2,
 					skin:'',
@@ -203,7 +203,7 @@ layui.use(['layer', 'form', 'table'], function() {
 	                
 	         },
 			addLink: function() {
-				var index = layer.open({
+				var index = layui.layer.open({
 					title: "菜单添加",
 					type: 2,
 					skin:'',

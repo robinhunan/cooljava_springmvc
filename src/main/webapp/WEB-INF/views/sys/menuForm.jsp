@@ -104,7 +104,7 @@
 	layui.use(['form','layer','jquery'],function(){
 		   var $ = layui.$,
 		   form = layui.form,
-		   layer = layui.layer;
+		   layer = parent.layer === undefined ? layui.layer : top.layer;
 		   
 		   //select赋值
 		   $("#sel").find("option[value='" + type + "']").attr("selected",true);
