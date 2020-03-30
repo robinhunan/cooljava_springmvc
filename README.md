@@ -7,3 +7,5 @@ CoolJava是一款快速开发模块化脚手架，以Spring MVC为模型视图�
 3. 执行 mvn tomcat7:run
 4. 在浏览器地址栏输入访问： [http://localhost:8080/CoolJava](http://localhost:8080/CoolJava "http://localhost:8080/CoolJava")
 
+springboot 版本请访问 https://github.com/robinhunan/cooljava
+
